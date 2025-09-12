@@ -708,9 +708,9 @@ planet.add(atmosphere);
 
 // ---- TẠO CÁC VÒNG CHỮ QUAY QUANH HÀNH TINH ----
 const ringTexts = [
-  "Lê Quốc Khánh",
-  "waguri kaoruko",
-  "24/06/2009",
+  "Mạc Đĩnh Chi",
+  "Nhóm 2 Lớp 10B",
+  
   ...(window.dataCCD && window.dataCCD.data.ringTexts ? window.dataCCD.data.ringTexts : [])
 ];
 
