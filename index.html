@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bài thuyết trình nhóm 2</title>
-  <link rel="stylesheet" href="style.css">
+
+  <!-- Import-map cho Three.js -->
   <script type="importmap">
   {
     "imports": {
@@ -15,78 +16,176 @@
     }
   }
   </script>
+
   <style>
-    /* Video intro toàn màn hình */
+    /* ====== MÀN HÌNH YÊU CẦU BẬT ÂM THANH ====== */
+    #sound-gate {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 999999;
+      font-family: sans-serif;
+      text-align: center;
+    }
+    #sound-gate h1 { font-size: 2rem; margin-bottom: 1rem; }
+    #unlock-sound {
+      padding: 0.75rem 1.5rem;
+      font-size: 1.2rem;
+      cursor: pointer;
+      border: none;
+      background: #fff;
+      color: #000;
+      border-radius: 4px;
+      transition: background .25s;
+    }
+    #unlock-sound:hover { background: #ddd; }
+
+    /* ====== VIDEO INTRO TOÀN MÀN HÌNH ====== */
     #intro-video {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: black;
+      background: #000;
       z-index: 9999;
       display: flex;
       justify-content: center;
       align-items: center;
     }
-
     #intro-video video {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
 
-    /* Ẩn phần web chính lúc đầu */
-    #main-content {
+    /* ====== NỘI DUNG CHÍNH (ẨN LÚC ĐẦU) ====== */
+    #main-content { display: none; }
+
+    /* ====== CÁNH BÁO XOAY NGANG (TUỲ BẠN) ====== */
+    #landscape-warning {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      color: #fff;
+      z-index: 9998;
       display: none;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+    .rotate-icon {
+      width: 60px;
+      height: 60px;
+      border: 4px solid #fff;
+      border-radius: 50%;
+      position: relative;
+      animation: rotate 1.5s linear infinite;
+    }
+    .rotate-icon::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border: 10px solid transparent;
+      border-left-color: #fff;
+      transform: translate(-50%, -50%);
+    }
+    @keyframes rotate { to { transform: rotate(360deg); } }
+
+    /* ====== OVERLAY & INFO ====== */
+    #dark-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.6);
+      z-index: 100;
+      pointer-events: none;
+      display: none;
+    }
+    #info {
+      position: fixed;
+      bottom: 1rem;
+      left: 1rem;
+      color: #fff;
+      font-family: sans-serif;
+      z-index: 101;
     }
   </style>
 </head>
 <body>
-  <!-- Intro video -->
+  <!-- 1. MÀN HÌNH KHOÁ ÂM-THANH -->
+  <div id="sound-gate">
+    <h1>Stellar Bloom</h1>
+    <p>Nhấn nút bên dưới để bắt đầu trải nghiệm có âm thanh</p>
+    <button id="unlock-sound">Bắt đầu</button>
+  </div>
+
+  <!-- 2. VIDEO INTRO -->
   <div id="intro-video">
-    <video id="intro" autoplay muted playsinline>
+    <video id="intro" muted playsinline>
       <source src="videogioithieu.mp4" type="video/mp4">
       <source src="videogioithieu.webm" type="video/webm">
-      Your browser does not support the video tag.
+      Trình duyệt của bạn không hỗ trợ thẻ video.
     </video>
   </div>
 
-  <!-- Nội dung chính -->
+  <!-- 3. NỘI DUNG CHÍNH -->
   <div id="main-content">
-    <!-- Audio không autoplay trực tiếp để tránh bị chặn -->
+    <!-- Nhạc nền -->
     <audio id="bg-music" loop>
       <source src="music.mp3" type="audio/mpeg">
     </audio>
 
+    <!-- Canvas Three.js -->
     <div id="container"></div>
+
+    <!-- Cảnh báo xoay ngang (tuỳ chọn) -->
     <div id="landscape-warning">
-      <div class="warning-content">
-        <div class="rotate-icon"></div>
-        <h1>Stellar Bloom</h1>
-        <h1>Tinh Cầu</h1>
-        <div class="stars-bg"></div>
-      </div>
+      <div class="rotate-icon"></div>
+      <h1>Vui lòng xoay ngang màn hình</h1>
     </div>
+
+    <!-- Overlay & info -->
     <div id="dark-overlay"></div>
     <div id="info"></div>
+
+    <!-- Script 3D -->
     <script type="module" src="script.js"></script>
   </div>
 
-  <!-- Script xử lý khi video kết thúc -->
+  <!-- 4. XỬ LÝ TƯƠNG TÁC & AUTPLAY CÓ TIẾNG -->
   <script>
-    const intro = document.getElementById("intro");
-    const bgMusic = document.getElementById("bg-music");
+    const intro      = document.getElementById('intro');
+    const bgMusic    = document.getElementById('bg-music');
+    const soundGate  = document.getElementById('sound-gate');
+    const unlockBtn  = document.getElementById('unlock-sound');
 
-    intro.onended = () => {
-      document.getElementById("intro-video").style.display = "none";
-      document.getElementById("main-content").style.display = "block";
+    // Khi người dùng click "Bắt đầu"
+    unlockBtn.addEventListener('click', () => {
+      // Bỏ muted → cho phép có tiếng
+      intro.muted   = false;
+      bgMusic.muted = false;
 
-      // Phát nhạc khi intro kết thúc
-      bgMusic.play().catch(err => {
-        console.log("Autoplay bị chặn, cần user click:", err);
-      });
-    };
+      // Phát ngay
+      intro.play().catch(() => {});
+      bgMusic.play().catch(() => {});
+
+      // Ẩn màn hình khoá
+      soundGate.style.display = 'none';
+    }, { once: true });
+
+    // Khi video intro kết thúc → hiện nội dung chính
+    intro.addEventListener('ended', () => {
+      document.getElementById('intro-video').style.display = 'none';
+      document.getElementById('main-content').style.display = 'block';
+    });
   </script>
 </body>
 </html>
