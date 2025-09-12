@@ -45,7 +45,7 @@
 <body>
   <!-- Intro video -->
   <div id="intro-video">
-    <video id="intro" autoplay playsinline>
+    <video id="intro" autoplay muted playsinline>
       <source src="videogioithieu.mp4" type="video/mp4">
       <source src="videogioithieu.webm" type="video/webm">
       Your browser does not support the video tag.
@@ -54,6 +54,11 @@
 
   <!-- Nội dung chính -->
   <div id="main-content">
+    <!-- Audio không autoplay trực tiếp để tránh bị chặn -->
+    <audio id="bg-music" loop>
+      <source src="music.mp3" type="audio/mpeg">
+    </audio>
+
     <div id="container"></div>
     <div id="landscape-warning">
       <div class="warning-content">
@@ -71,9 +76,16 @@
   <!-- Script xử lý khi video kết thúc -->
   <script>
     const intro = document.getElementById("intro");
+    const bgMusic = document.getElementById("bg-music");
+
     intro.onended = () => {
       document.getElementById("intro-video").style.display = "none";
       document.getElementById("main-content").style.display = "block";
+
+      // Phát nhạc khi intro kết thúc
+      bgMusic.play().catch(err => {
+        console.log("Autoplay bị chặn, cần user click:", err);
+      });
     };
   </script>
 </body>
