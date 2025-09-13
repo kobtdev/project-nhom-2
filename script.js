@@ -75,7 +75,7 @@ function createFullscreenOverlay() {
     justify-content: center;
     backdrop-filter: blur(10px);
     opacity: 0;
-    transition: opacity 0.5s ease-in-out;
+    transition: opacity 1s ease-in-out;
   `;
   
   const img = document.createElement('img');
@@ -86,7 +86,7 @@ function createFullscreenOverlay() {
     border-radius: 15px;
     box-shadow: 0 0 50px rgba(255, 255, 255, 0.3);
     transform: scale(0.8);
-    transition: transform 0.3s ease-in-out;
+    transition: transform 0.6s ease-in-out;
   `;
   
   const closeBtn = document.createElement('div');
@@ -142,7 +142,7 @@ function createFullscreenOverlay() {
     overlay.style.opacity = '0';
     setTimeout(() => {
       overlay.style.display = 'none';
-    }, 500);
+    }, 1000);
   };
   
   overlay.addEventListener('click', (e) => {
